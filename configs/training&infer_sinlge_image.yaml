@@ -1,0 +1,102 @@
+runner_module: runners.runner_UniADRS_Single - runner_UniADRS_Single
+random_seed: 666
+params:
+  epochs: 100
+  device: cuda:4
+  batch_size: 1
+  fusion_paths: ''
+  print_intervals: 10
+  training_channels: 270
+
+model:
+  name: models.UniADRS - UniADRS
+  args:
+    n_channels: ${params.training_channels}
+    device: ${params.device}
+  ckpt_dir: ''
+  R: 3.0
+  
+transforms:
+  train:
+  - name: albumentations - ToFloat
+    args:
+      max_value: 1.0
+  - name: albumentations - Resize
+    args:
+      height: 224
+      width: 224
+      p: 1
+      interpolation: 0
+  - name: albumentations.pytorch - ToTensorV2
+    args:
+      p: 1
+  test:
+  - name: albumentations - ToFloat
+    args:
+      max_value: 1.0
+  - name: albumentations.pytorch - ToTensorV2
+    args:
+      p: 1
+datasets:
+  train:
+    name: datasets.Anomaly_Training_Dataset - Anomaly_Training_Dataset
+    args:
+      spatial_img_dir: ./data/isAID/train/images
+      spatial_mask_dir: ./data/isAID/train/Instance_masks/images
+      object_bank_img_dir: ./data/isAID/object_bank_v2/img
+      object_bank_label_dir: ./data/isAID/object_bank_v2/label
+      spectral_img_dirs: 
+      - ./data/HH_LK_HH/Envi_standard_format/WHU-Hi-LongKou/patches/img_patch_100_stride_50
+      - ./data/HH_LK_HH/Envi_standard_format/WHU-Hi-HongHu/patches/img_patch_100_stride_50
+      - ./data/HH_LK_HH/Envi_standard_format/WHU-Hi-HanChuan/patches/img_patch_100_stride_50
+  test:
+    name: datasets.Test_Single_Image - Test_Single_Image
+    args:
+      img_paths:
+      - /home/ljt21/light-RSAD/had_data/mmHAD数据/高光谱/WHU-Hi-Station/WHU-Hi-Station原始数据_transpose.tif
+      mask_paths:
+      - /home/ljt21/light-RSAD/had_data/mmHAD数据/高光谱/WHU-Hi-Station/label_transpose.tif
+      test_patch_sizes:
+      - 50
+      normalize:
+      - false
+      test_pad_sizes:
+      - 60
+      test_sizes:
+      - 112
+dataloaders:
+  train:
+    name: torch.utils.data - DataLoader
+    args:
+      batch_size: ${params.batch_size}
+      num_workers: 1
+      pin_memory: true
+      shuffle: true
+  test:
+    name: torch.utils.data - DataLoader
+    args:
+      batch_size: 1
+      num_workers: 3
+      pin_memory: true
+      shuffle: false
+optimizer:
+  name: torch.optim - Adam
+  args:
+    lr: 0.01
+    weight_decay: 1.0e-05
+scheduler:
+  name: torch.optim.lr_scheduler - CosineAnnealingWarmRestarts
+  args:
+    T_0: 10
+    T_mult: 2
+    eta_min: 0.0001
+    last_epoch: -1
+criterions:
+  P_AUC:
+    name: criterions.AUCROC_PCELoss - AUCROC_PCELoss
+    args:
+      num_classes: 1
+      num_anchors: 6
+      fpr_range_lower: 0.0
+      fpr_range_upper: 0.3
+      device: ${params.device}

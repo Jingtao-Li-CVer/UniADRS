@@ -1,0 +1,247 @@
+runner_module: runners.runner_UniADRS_Folder - runner_UniADRS_Folder
+random_seed: 111
+params:
+  epochs: 100
+  device: cuda:2
+  batch_size: 1
+  training_channels: 270
+  print_intervals: 10
+
+model:
+  name: models.UniADRS - UniADRS
+  args:
+    n_channels: ${params.training_channels}
+    device: ${params.device}
+  ckpt_dir: ''
+  R: 3.0
+
+transforms:
+  train:
+  - name: albumentations - ToFloat
+    args:
+      max_value: 1.0
+  - name: albumentations - Resize
+    args:
+      height: 224
+      width: 224
+      p: 1
+      interpolation: 0
+  - name: albumentations.pytorch - ToTensorV2
+    args:
+      p: 1
+
+  test_visible_light:
+  - name: albumentations - ToFloat
+    args:
+      max_value: 1.0
+  - name: albumentations - Resize
+    args:
+      height: 256
+      width: 256
+      p: 1
+      interpolation: 0
+  - name: albumentations.pytorch - ToTensorV2
+    args:
+      p: 1
+
+  test_thermal:
+  - name: albumentations - ToFloat
+    args:
+      max_value: 1.0
+  - name: albumentations - Resize
+    args:
+      height: 256
+      width: 256
+      p: 1
+      interpolation: 0
+  - name: albumentations.pytorch - ToTensorV2
+    args:
+      p: 1
+
+  test_sar:
+  - name: albumentations - ToFloat
+    args:
+      max_value: 1.0
+  - name: albumentations - Resize
+    args:
+      height: 256
+      width: 256
+      p: 1
+      interpolation: 0
+  - name: albumentations.pytorch - ToTensorV2
+    args:
+      p: 1
+
+  test_low_light:
+  - name: albumentations - ToFloat
+    args:
+      max_value: 1.0
+  - name: albumentations - Resize
+    args:
+      height: 256
+      width: 256
+      p: 1
+      interpolation: 0
+  - name: albumentations.pytorch - ToTensorV2
+    args:
+      p: 1
+
+  test_HSI:
+  - name: albumentations - ToFloat
+    args:
+      max_value: 1.0
+  - name: albumentations - Resize
+    args:
+      height: 256
+      width: 256
+      p: 1
+      interpolation: 0
+  - name: albumentations.pytorch - ToTensorV2
+    args:
+      p: 1
+
+datasets:
+  train:
+    name: datasets.Anomaly_Training_Dataset - Anomaly_Training_Dataset
+    args:
+      spatial_img_dir: ./data/isAID/train/images
+      spatial_mask_dir: ./data/isAID/train/Instance_masks/images
+      object_bank_img_dir: ./data/isAID/object_bank_v2/img
+      object_bank_label_dir: ./data/isAID/object_bank_v2/label
+      spectral_img_dirs: 
+      - ./data/HH_LK_HH/Envi_standard_format/WHU-Hi-LongKou/patches/img_patch_100_stride_50
+      - ./data/HH_LK_HH/Envi_standard_format/WHU-Hi-HongHu/patches/img_patch_100_stride_50
+      - ./data/HH_LK_HH/Envi_standard_format/WHU-Hi-HanChuan/patches/img_patch_100_stride_50
+
+  test_HSI:
+    name: datasets.Test_Folder_Image - Test_Folder_Image
+    args:
+      img_dir: ./data/multi-modality-data/HSI/images
+      mask_dir: ./data/multi-modality-data/HSI/labels
+      test_size: 128
+      test_patch_size: 50
+      test_pad_size: 40
+      replace_org: ''
+      replace_dst: ''
+      normalize: true
+
+  test_visible_light:
+    name: datasets.Test_Folder_Image - Test_Folder_Image
+    args:
+      img_dir: ./data/multi-modality-data/visible_light/images
+      mask_dir: ./data/multi-modality-data/visible_light/labels
+      test_size: 256
+      test_patch_size: 120
+      test_pad_size: 20
+      replace_org: 'image'
+      replace_dst: 'mask'
+      normalize: true
+
+  test_thermal:
+    name: datasets.Test_Folder_Image - Test_Folder_Image
+    args:
+      img_dir: ./data/multi-modality-data/thermal/images
+      mask_dir: ./data/multi-modality-data/thermal/labels
+      test_size: 224
+      test_patch_size: 120
+      test_pad_size: 40
+      replace_org: ''
+      replace_dst: ''
+      normalize: true
+
+  test_sar:
+    name: datasets.Test_Folder_Image - Test_Folder_Image
+    args:
+      img_dir: ./data/multi-modality-data/SAR/images
+      mask_dir: ./data/multi-modality-data/SAR/labels
+      test_size: 224
+      test_patch_size: 80
+      test_pad_size: 140
+      replace_org: 'image'
+      replace_dst: 'mask'
+      normalize: true
+
+
+  test_low_light:
+    name: datasets.Test_Folder_Image - Test_Folder_Image
+    args:
+      img_dir: ./data/multi-modality-data/low_light/images/
+      mask_dir: ./data/multi-modality-data/low_light/labels
+      test_size: 224
+      test_patch_size: 100
+      test_pad_size: 60
+      replace_org: '.bmp'
+      replace_dst: '.png'
+      normalize: true
+      
+
+dataloaders:
+  train:
+    name: torch.utils.data - DataLoader
+    args:
+      batch_size: ${params.batch_size}
+      num_workers: 1
+      pin_memory: true
+      shuffle: true
+
+  test_HSI:
+    name: torch.utils.data - DataLoader
+    args:
+      batch_size: 1
+      num_workers: 3
+      pin_memory: true
+      shuffle: false
+
+  test_visible_light:
+    name: torch.utils.data - DataLoader
+    args:
+      batch_size: 1
+      num_workers: 3
+      pin_memory: true
+      shuffle: false
+
+  test_thermal:
+    name: torch.utils.data - DataLoader
+    args:
+      batch_size: 1
+      num_workers: 3
+      pin_memory: true
+      shuffle: false
+
+  test_sar:
+    name: torch.utils.data - DataLoader
+    args:
+      batch_size: 1
+      num_workers: 3
+      pin_memory: true
+      shuffle: false
+
+  test_low_light:
+    name: torch.utils.data - DataLoader
+    args:
+      batch_size: 1
+      num_workers: 3
+      pin_memory: true
+      shuffle: false
+
+optimizer:
+  name: torch.optim - Adam
+  args:
+    lr: 0.01
+    weight_decay: 1.0e-05
+scheduler:
+  name: torch.optim.lr_scheduler - CosineAnnealingWarmRestarts
+  args:
+    T_0: 10
+    T_mult: 2
+    eta_min: 0.0001
+    last_epoch: -1
+criterions:
+  P_AUC:
+    name: criterions.AUCROC_RankingLoss - AUCROC_RankingLoss
+    args:
+      num_classes: 1
+      num_anchors: 6
+      fpr_range_lower: 0.0
+      fpr_range_upper: 0.3
+      device: ${params.device}
