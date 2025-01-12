@@ -25,7 +25,7 @@ class UniADRS(nn.Module):
         self.n_channels = n_channels
         self.device = device
 
-        make_layers([descriptor_dim, descriptor_dim], n_channels)
+        self.spectral_stem = make_layers([descriptor_dim, descriptor_dim], n_channels)
         
         self.spatial_stem = self.spectral_stem if stem_identity else self.spatial_stem_
        
