@@ -79,8 +79,6 @@ class UniADRS(nn.Module):
         labeled_locs = tar != 2
         score_labeled = (pred.squeeze(1).ravel())[labeled_locs]
         gt_labeled = tar[labeled_locs]
-        weight = torch.ones(score_labeled.shape,).to(self.device)
-        weight[gt_labeled == 0] *=  0.5
         pixel_level_loss = self.loss(score_labeled, gt_labeled.int())
 
         loss =  pixel_level_loss + feature_level_loss
