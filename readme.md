@@ -20,7 +20,7 @@ This is a PyTorch implementation of the [UniADRS model](https://ieeexplore.ieee.
 2. Different from traditional deep detectors, we convert the learning target from **varying** background distribution to **consistent** deviation relationship between anomalies and background for **zero-shot detection**.
 3. We **theoretically prove** that meeting the large margin condition in training samples can guarantee the correct deviation rank for unseen anomaly and background.
 4. We have built **an anomaly detection dataset with five modalities** including hyperspectral, visible light, synthetic aperture radar
-(SAR), infrared and low-light.
+(SAR), infrared and low-light. 
 
 
 ### Introduction
