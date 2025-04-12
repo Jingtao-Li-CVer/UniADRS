@@ -36,7 +36,6 @@ Current anomaly detectors aim to learn the certain background distribution, the 
 1. Install required packages according to the requirements.txt.
 2. Download the required datasets for anomaly simulating (data.rar) and testing (data2.rar) from the following link and put all subforders in the `data` folder.
     (https://www.wjx.cn/vm/ruVKZ9e.aspx#) Link would be shown after filling the form.
-3. The pre-trained checkpoints can be downloaded from [here](https://pan.baidu.com/s/1I4LD-FWb5aVtEVcD9rcrcA?pwd=8h1y), which is retrained using the updated code.
 
 ### Model Training and Testing
 
