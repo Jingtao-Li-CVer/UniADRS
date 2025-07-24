@@ -93,7 +93,7 @@ scheduler:
     last_epoch: -1
 criterions:
   P_AUC:
-    name: criterions.AUCROC_PCELoss - AUCROC_PCELoss
+    name: criterions.AUCROC_RankingLoss - AUCROC_RankingLoss
     args:
       num_classes: 1
       num_anchors: 6
